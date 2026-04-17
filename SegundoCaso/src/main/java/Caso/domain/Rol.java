@@ -9,6 +9,7 @@ package Caso.domain;
  * @author Damin
  */
 
+
 // La clase rol ocupa:
 
 // id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
