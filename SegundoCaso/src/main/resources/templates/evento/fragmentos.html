@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{general/fragmentos :: head}"></head>
+
+<body>
+
+    <section th:fragment="agregar">
+
+        <div class="row py-3">
+            <div class="col-md-3">
+                <button type="button" class="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#agregarEventoModal">
+                    Agregar Evento
+                </button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="agregarEventoModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Nuevo Evento</h5>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <form th:action="@{/evento/guardar}"
+                          th:object="${evento}"
+                          method="post">
+
+                        <div class="modal-body">
+
+                            <div class="mb-3">
+                                <label>Nombre</label>
+                                <input type="text" th:field="*{nombre}"
+                                       class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Descripción</label>
+                                <textarea th:field="*{descripcion}"
+                                          class="form-control"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Fecha</label>
+                                <input type="date" th:field="*{fecha}"
+                                       class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Capacidad</label>
+                                <input type="number" th:field="*{capacidad}"
+                                       class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Activo</label>
+                                <input type="checkbox" th:field="*{activo}">
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">
+                                Cerrar
+                            </button>
+
+                            <button type="submit"
+                                    class="btn btn-success">
+                                Guardar
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <section th:fragment="listado">
+
+        <div class="card mt-3">
+            <div class="card-header bg-success text-white">
+                Lista de Eventos
+            </div>
+
+            <div class="card-body">
+
+                <table class="table table-striped">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Fecha</th>
+                            <th>Capacidad</th>
+                            <th>Estado</th>
+                            <th sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_ORGANIZADOR')">
+                                Acciones
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="e : ${eventos}">
+
+                            <td th:text="${e.id}"></td>
+
+                            <td th:text="${e.nombre}"></td>
+
+                            <td>
+                                <button class="btn btn-info btn-sm"
+                                        data-bs-toggle="modal"
+                                        th:attr="data-bs-target='#desc__' + ${e.id}">
+                                    Ver
+                                </button>
+                            </td>
+
+                            <td th:text="${#temporals.format(e.fecha, 'dd/MM/yyyy')}"></td>
+
+                            <td th:text="${e.capacidad}"></td>
+
+                            <td>
+                                <span th:text="${e.activo} ? 'Activo' : 'Inactivo'"
+                                      th:classappend="${e.activo} ? 'text-success' : 'text-danger'">
+                                </span>
+                            </td>
+
+                            <td sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_ORGANIZADOR')">
+
+                                <a th:href="@{/evento/editar/{id}(id=${e.id})}"
+                                   class="btn btn-warning btn-sm">
+                                    Editar
+                                </a>
+
+                                <a th:href="@{/evento/eliminar/{id}(id=${e.id})}"
+                                   class="btn btn-danger btn-sm">
+                                    Eliminar
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        <div th:each="e : ${eventos}">
+                            <div class="modal fade"
+                                 th:id="'desc__' + ${e.id}"
+                                 tabindex="-1">
+
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+
+                                        <div class="modal-header bg-info text-white">
+                                            <h5 class="modal-title">Descripción</h5>
+                                            <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal"></button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            <p th:text="${e.descripcion}"></p>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">
+                                                Cerrar
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+
+    </section>
+
+    <section th:fragment="editar">
+
+        <div class="row mt-4">
+            <div class="col-md-8 offset-md-2">
+
+                <div class="card">
+                    <div class="card-header bg-warning">
+                        Editar Evento
+                    </div>
+
+                    <div class="card-body">
+
+                        <form th:action="@{/evento/guardar}"
+                              th:object="${evento}"
+                              method="post">
+
+                            <input type="hidden" th:field="*{id}">
+
+                            <div class="mb-3">
+                                <label>Nombre</label>
+                                <input type="text" th:field="*{nombre}"
+                                       class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Descripción</label>
+                                <textarea th:field="*{descripcion}"
+                                          class="form-control"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Fecha</label>
+                                <input type="date" th:field="*{fecha}"
+                                       class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Capacidad</label>
+                                <input type="number" th:field="*{capacidad}"
+                                       class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Activo</label>
+                                <input type="checkbox" th:field="*{activo}">
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-success">
+                                Guardar
+                            </button>
+
+                            <a th:href="@{/evento/listado}"
+                               class="btn btn-secondary">
+                                Volver
+                            </a>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </section>
+
+</body>
+</html>

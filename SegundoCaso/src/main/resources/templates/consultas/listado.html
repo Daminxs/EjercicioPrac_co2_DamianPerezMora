@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns="http://www.thymeleaf.org">
+
+    <head th:replace="~{general/fragmentos :: head}"></head>
+
+    <body>
+
+        <header th:replace="~{general/fragmentos :: header}"></header>
+
+        <div class="container mt-4">
+
+            <h2>Consultas de Eventos</h2>
+
+            <a th:href="@{/consultas}" class="btn btn-danger mb-3">
+                Ocultar / Limpiar
+            </a>
+
+            <a th:href="@{/consultas/todos}" class="btn btn-secondary mb-3">
+                Mostrar Todos
+            </a>
+
+            <a th:href="@{/consultas/activos}" class="btn btn-success mb-3">
+                Ver Eventos Activos
+            </a>
+
+            <form th:action="@{/consultas/nombre}" method="post" class="mb-3">
+                <input type="text" name="nombre" placeholder="Buscar por nombre"
+                       class="form-control"/>
+                <button type="submit" class="btn btn-primary mt-2">Buscar</button>
+            </form>
+
+            <form th:action="@{/consultas/fechas}" method="post" class="mb-3">
+                <input type="date" name="inicio" class="form-control mb-2"/>
+                <input type="date" name="fin" class="form-control mb-2"/>
+                <button type="submit" class="btn btn-warning">Buscar por fechas</button>
+            </form>
+
+            <div th:if="${eventos != null}">
+
+                <table class="table table-striped">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+
+                            <th th:if="${modo != 'activos'}">Fecha</th>
+                            <th th:if="${modo != 'activos'}">Capacidad</th>
+
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="e : ${eventos}">
+
+                            <td th:text="${e.id}"></td>
+
+                            <td th:text="${e.nombre}"></td>
+
+                            <td th:text="${e.descripcion}"></td>
+
+                            <td th:if="${modo != 'activos'}"
+                                th:text="${#temporals.format(e.fecha,'dd/MM/yyyy')}">
+                            </td>
+
+                            <td th:if="${modo != 'activos'}"
+                                th:text="${e.capacidad}">
+                            </td>
+
+                            <td th:text="${e.activo} ? 'Activo' : 'Inactivo'"
+                                th:classappend="${e.activo} ? 'text-success' : 'text-danger'">
+                            </td>
+
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <footer th:replace="~{general/fragmentos :: footer}"></footer>
+
+    </body>
+</html>

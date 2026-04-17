@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    
+<head th:replace="~{general/fragmentos :: head}"></head>
+
+<body>
+
+    <section th:fragment="agregar">
+
+        <div class="row py-3">
+            <div class="col-md-3">
+                <button type="button" class="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#agregarUsuarioModal">
+                    Agregar Usuario
+                </button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="agregarUsuarioModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Nuevo Usuario</h5>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <form th:action="@{/usuario/guardar}"
+                          th:object="${usuario}"
+                          method="post">
+
+                        <div class="modal-body">
+
+                            <div class="mb-3">
+                                <label>Nombre</label>
+                                <input type="text"
+                                       th:field="*{nombre}"
+                                       class="form-control"
+                                       required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Correo</label>
+                                <input type="email"
+                                       th:field="*{email}"
+                                       class="form-control"
+                                       required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Contraseña</label>
+                                <input type="password"
+                                       th:field="*{password}"
+                                       class="form-control"
+                                       required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Rol</label>
+                                <select th:field="*{rol}"
+                                        class="form-control">
+                                    <option th:each="r : ${roles}"
+                                            th:value="${r.id}"
+                                            th:text="${r.nombre}">
+                                    </option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    data-bs-dismiss="modal">
+                                Cerrar
+                            </button>
+
+                            <button type="submit"
+                                    class="btn btn-success">
+                                Guardar
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+    <section th:fragment="listado">
+
+    <div class="card mt-3">
+        <div class="card-header bg-success text-white">
+            Lista de Usuarios
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-striped">
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                        <th>Detalle</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="u : ${usuarios}">
+
+                        <td th:text="${u.id}"></td>
+
+                        <td th:text="${u.nombre}"></td>
+
+                        <td th:text="${u.email}"></td>
+
+                        <td th:text="${u.rol.nombre}"></td>
+
+                        <td>
+                            <button class="btn btn-info btn-sm"
+                                    data-bs-toggle="modal"
+                                    th:attr="data-bs-target='#detalleUsuario__' + ${u.id}">
+                                Ver
+                            </button>
+                        </td>
+
+                        <td>
+                            <a th:href="@{/usuario/editar/{id}(id=${u.id})}"
+                               class="btn btn-warning btn-sm">
+                                Editar
+                            </a>
+
+                            <a th:href="@{/usuario/eliminar/{id}(id=${u.id})}"
+                               class="btn btn-danger btn-sm">
+                                Eliminar
+                            </a>
+                        </td>
+
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+    <div th:each="u : ${usuarios}">
+
+        <div class="modal fade"
+             th:id="'detalleUsuario__' + ${u.id}"
+             tabindex="-1">
+
+            <div class="modal-dialog">
+
+                <div class="modal-content">
+
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Detalle Usuario</h5>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <p><strong>ID:</strong> <span th:text="${u.id}"></span></p>
+
+                        <p><strong>Nombre:</strong> <span th:text="${u.nombre}"></span></p>
+
+                        <p><strong>Correo:</strong> <span th:text="${u.email}"></span></p>
+
+                        <p><strong>Rol:</strong> <span th:text="${u.rol.nombre}"></span></p>
+
+                        <p>
+                            <strong>Estado:</strong>
+                            <span th:text="${u.activo} ? 'Activo' : 'Inactivo'"
+                                  th:classappend="${u.activo} ? 'text-success' : 'text-danger'">
+                            </span>
+                        </p>
+
+                        <p>
+                            <strong>Fecha creación:</strong>
+                            <span th:text="${#temporals.format(u.fechaCreacion,'dd/MM/yyyy HH:mm')}"></span>
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+    <section th:fragment="editar">
+
+        <div class="row mt-4">
+            <div class="col-md-8 offset-md-2">
+
+                <div class="card">
+                    <div class="card-header bg-warning">
+                        Editar Usuario
+                    </div>
+
+                    <div class="card-body">
+
+                        <form th:action="@{/usuario/guardar}"
+                              th:object="${usuario}"
+                              method="post">
+
+                            <input type="hidden" th:field="*{id}">
+
+                            <div class="mb-3">
+                                <label>Nombre</label>
+                                <input type="text"
+                                       th:field="*{nombre}"
+                                       class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Correo</label>
+                                <input type="email"
+                                       th:field="*{email}"
+                                       class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Rol</label>
+                                <select th:field="*{rol}"
+                                        class="form-control">
+                                    <option th:each="r : ${roles}"
+                                            th:value="${r.id}"
+                                            th:text="${r.nombre}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-success">
+                                Guardar
+                            </button>
+
+                            <a th:href="@{/usuario/listado}"
+                               class="btn btn-secondary">
+                                Volver
+                            </a>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </section>
+
+</body>
+</html>

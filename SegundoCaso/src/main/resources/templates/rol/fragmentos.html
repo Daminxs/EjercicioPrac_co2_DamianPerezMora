@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{general/fragmentos :: head}"></head>
+
+<body>
+
+    <section th:fragment="agregar">
+
+        <div class="row py-3">
+            <div class="col-md-3">
+                <button type="button" class="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#agregarRolModal">
+                    Agregar Rol
+                </button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="agregarRolModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Nuevo Rol</h5>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <form th:action="@{/rol/guardar}"
+                          th:object="${rol}"
+                          method="post">
+
+                        <div class="modal-body">
+
+                            <div class="mb-3">
+                                <label>Nombre</label>
+                                <input type="text"
+                                       th:field="*{nombre}"
+                                       class="form-control"
+                                       required>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    data-bs-dismiss="modal">
+                                Cerrar
+                            </button>
+
+                            <button type="submit"
+                                    class="btn btn-success">
+                                Guardar
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+
+    <section th:fragment="listado">
+
+        <div class="card mt-3">
+            <div class="card-header bg-success text-white">
+                Lista de Roles
+            </div>
+
+            <div class="card-body">
+
+                <table class="table table-striped">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="r : ${roles}">
+                            <td th:text="${r.id}"></td>
+                            <td th:text="${r.nombre}"></td>
+
+                            <td>
+                                <a th:href="@{/rol/editar/{id}(id=${r.id})}"
+                                   class="btn btn-warning btn-sm">
+                                    Editar
+                                </a>
+
+                                <a th:href="@{/rol/eliminar/{id}(id=${r.id})}"
+                                   class="btn btn-danger btn-sm">
+                                    Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+
+    </section>
+
+
+
+    <section th:fragment="editar">
+
+        <div class="row mt-4">
+            <div class="col-md-6 offset-md-3">
+
+                <div class="card">
+                    <div class="card-header bg-warning">
+                        Editar Rol
+                    </div>
+
+                    <div class="card-body">
+
+                        <form th:action="@{/rol/guardar}"
+                              th:object="${rol}"
+                              method="post">
+
+                            <input type="hidden" th:field="*{id}">
+
+                            <div class="mb-3">
+                                <label>Nombre</label>
+                                <input type="text"
+                                       th:field="*{nombre}"
+                                       class="form-control">
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-success">
+                                Guardar
+                            </button>
+
+                            <a th:href="@{/rol/listado}"
+                               class="btn btn-secondary">
+                                Volver
+                            </a>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </section>
+
+</body>
+</html>
